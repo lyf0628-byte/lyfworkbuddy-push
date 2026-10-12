@@ -1,0 +1,105 @@
+{
+  "documents": [
+    {
+      "doc_id": "BX202609001",
+      "employee": "张军",
+      "department": "技术部",
+      "type": "差旅费",
+      "amount": 3580,
+      "status": "待审核",
+      "submit_date": "2026-09-20",
+      "items": [
+        {"category": "高铁", "amount": 800, "desc": "北京-上海"},
+        {"category": "住宿", "amount": 1500, "desc": "上海3天"},
+        {"category": "餐饮", "amount": 600, "desc": "出差补贴"},
+        {"category": "市内交通", "amount": 680, "desc": "打车、地铁"}
+      ]
+    },
+    {
+      "doc_id": "BX202609002",
+      "employee": "李明",
+      "department": "销售部",
+      "type": "招待费",
+      "amount": 1200,
+      "status": "财务核对中",
+      "submit_date": "2026-09-22",
+      "items": [
+        {"category": "餐饮", "amount": 1000, "desc": "客户招待晚餐"},
+        {"category": "交通", "amount": 200, "desc": "接送客户"}
+      ]
+    },
+    {
+      "doc_id": "BX202609003",
+      "employee": "王芳",
+      "department": "财务部",
+      "type": "办公用品",
+      "amount": 350,
+      "status": "已付款",
+      "submit_date": "2026-09-15",
+      "items": [
+        {"category": "办公耗材", "amount": 350, "desc": "打印纸、墨盒"}
+      ]
+    },
+    {
+      "doc_id": "BX202609004",
+      "employee": "张军",
+      "department": "技术部",
+      "type": "通讯补贴",
+      "amount": 150,
+      "status": "已付款",
+      "submit_date": "2026-09-05",
+      "items": [
+        {"category": "通讯", "amount": 150, "desc": "9月话费补贴"}
+      ]
+    },
+    {
+      "doc_id": "BX202609005",
+      "employee": "赵强",
+      "department": "市场部",
+      "type": "差旅费",
+      "amount": 8900,
+      "status": "已驳回",
+      "submit_date": "2026-09-18",
+      "reject_reason": "超出住宿标准，需补充说明",
+      "items": [
+        {"category": "飞机", "amount": 3200, "desc": "北京-深圳往返"},
+        {"category": "住宿", "amount": 4500, "desc": "深圳5天（超标）"},
+        {"category": "餐饮", "amount": 800, "desc": "出差补贴"},
+        {"category": "市内交通", "amount": 400, "desc": "打车"}
+      ]
+    },
+    {
+      "doc_id": "BX202609006",
+      "employee": "李明",
+      "department": "销售部",
+      "type": "差旅费",
+      "amount": 5200,
+      "status": "总经理审批中",
+      "submit_date": "2026-09-25",
+      "items": [
+        {"category": "高铁", "amount": 1200, "desc": "北京-广州"},
+        {"category": "住宿", "amount": 2400, "desc": "广州4天"},
+        {"category": "餐饮", "amount": 400, "desc": "出差补贴"},
+        {"category": "市内交通", "amount": 1200, "desc": "打车、地铁"}
+      ]
+    },
+    {
+      "doc_id": "BX202610001",
+      "employee": "张军",
+      "department": "技术部",
+      "type": "招待费",
+      "amount": 800,
+      "status": "待审核",
+      "submit_date": "2026-10-08",
+      "items": [
+        {"category": "餐饮", "amount": 800, "desc": "技术交流客户招待"}
+      ]
+    }
+  ],
+  "employees": [
+    {"name": "张军", "level": "员工", "department": "技术部", "phone": "100元/月"},
+    {"name": "李明", "level": "员工", "department": "销售部", "phone": "150元/月"},
+    {"name": "王芳", "level": "经理", "department": "财务部", "phone": "200元/月"},
+    {"name": "赵强", "level": "经理", "department": "市场部", "phone": "200元/月"}
+  ]
+}

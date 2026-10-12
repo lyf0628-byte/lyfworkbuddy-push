@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>青禾报销助手-lyf智能体</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+        }
+        body {
+            background: var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .navbar-brand { font-weight: 700; font-size: 1.25rem; }
+        .navbar-brand i { color: var(--primary); margin-right: 8px; }
+        .stat-card {
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .stat-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+        }
+        .stat-value { font-size: 1.75rem; font-weight: 700; margin-top: 8px; }
+        .stat-label { color: #64748b; font-size: 0.875rem; }
+        .card {
+            border: none; border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .card-header {
+            background: white; border-bottom: 1px solid #e2e8f0;
+            border-radius: 16px 16px 0 0 !important;
+            padding: 16px 20px;
+        }
+        .card-title { font-weight: 600; font-size: 1.05rem; margin: 0; }
+        .badge-status {
+            padding: 6px 12px; border-radius: 20px; font-weight: 500; font-size: 0.8rem;
+        }
+        .status-pending { background: #fef3c7; color: #b45309; }
+        .status-checking { background: #dbeafe; color: #1d4ed8; }
+        .status-approving { background: #ede9fe; color: #6d28d9; }
+        .status-paid { background: #d1fae5; color: #047857; }
+        .status-rejected { background: #fee2e2; color: #b91c1c; }
+        .table { font-size: 0.9rem; }
+        .table thead th {
+            font-weight: 600; color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+            text-transform: uppercase; font-size: 0.75rem;
+            letter-spacing: 0.03em;
+        }
+        .table tbody tr { transition: background 0.15s; cursor: pointer; }
+        .table tbody tr:hover { background: #f1f5f9; }
+        .amount { font-weight: 600; font-family: 'SF Mono', Consolas, monospace; }
+        .chat-container {
+            height: 480px; overflow-y: auto;
+            padding: 16px; background: #f8fafc;
+            border-radius: 12px;
+        }
+        .chat-msg { margin-bottom: 14px; display: flex; }
+        .chat-msg.user { flex-direction: row-reverse; }
+        .chat-bubble {
+            max-width: 80%; padding: 10px 14px;
+            border-radius: 16px; white-space: pre-wrap;
+            font-size: 0.9rem; line-height: 1.5;
+        }
+        .chat-msg.assistant .chat-bubble {
+            background: white; border: 1px solid #e2e8f0; border-top-left-radius: 4px;
+        }
+        .chat-msg.user .chat-bubble {
+            background: var(--primary); color: white; border-top-right-radius: 4px;
+        }
+        .chat-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; color: white; flex-shrink: 0;
+        }
+        .chat-msg.assistant .chat-avatar { background: var(--primary); margin-right: 8px; }
+        .chat-msg.user .chat-avatar { background: #64748b; margin-left: 8px; }
+        .chat-input-area { padding: 12px; background: white; border-top: 1px solid #e2e8f0; border-radius: 0 0 12px 12px; }
+        .chat-input-area input { border-radius: 20px; padding: 10px 16px; }
+        .chat-input-area button { border-radius: 20px; padding: 10px 20px; }
+        .verify-result { padding: 16px; border-radius: 12px; margin-top: 12px; }
+        .verify-pass { background: #d1fae5; border: 1px solid #6ee7b7; }
+        .verify-warn { background: #fef3c7; border: 1px solid #fcd34d; }
+        .verify-fail { background: #fee2e2; border: 1px solid #fca5a5; }
+        .quick-btn {
+            font-size: 0.78rem; padding: 4px 10px; border-radius: 16px;
+            border: 1px solid #e2e8f0; background: white; color: #475569;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .quick-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .modal-content { border: none; border-radius: 16px; }
+        .modal-header { border-bottom: 1px solid #e2e8f0; }
+        .item-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #e2e8f0; }
+        .item-row:last-child { border: none; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand text-dark" href="#">
+            <i class="bi bi-cpu"></i>青禾报销助手-lyf智能体
+        </a>
+        <div class="d-flex gap-2">
+            <span class="badge bg-success-subtle text-success p-2 rounded-pill">
+                <i class="bi bi-activity me-1"></i>服务运行中
+            </span>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4 py-4">
+
+    <!-- 统计卡片 -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">单据总数</div>
+                        <div class="stat-value text-dark">{{ total_docs }}</div>
+                    </div>
+                    <div class="stat-icon" style="background:#dbeafe;color:#2563eb">
+                        <i class="bi bi-file-text"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">报销总金额</div>
+                        <div class="stat-value text-dark">¥{{ "%.2f"|format(total_amount) }}</div>
+                    </div>
+                    <div class="stat-icon" style="background:#d1fae5;color:#10b981">
+                        <i class="bi bi-currency-yen"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">待处理</div>
+                        <div class="stat-value" style="color:#f59e0b">{{ pending_count }}</div>
+                    </div>
+                    <div class="stat-icon" style="background:#fef3c7;color:#f59e0b">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">已付款</div>
+                        <div class="stat-value" style="color:#10b981">{{ paid_count }}</div>
+                    </div>
+                    <div class="stat-icon" style="background:#dcfce7;color:#16a34a">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- 单据报表 -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title"><i class="bi bi-table me-2 text-primary"></i>报销单据报表</h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="loadDocuments()">
+                            <i class="bi bi-arrow-clockwise me-1"></i>刷新
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0" id="docTable">
+                            <thead>
+                                <tr>
+                                    <th>单据号</th>
+                                    <th>申请人</th>
+                                    <th>部门</th>
+                                    <th>类型</th>
+                                    <th class="text-end">金额</th>
+                                    <th>状态</th>
+                                    <th>提交日期</th>
+                                    <th class="text-center">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docTableBody">
+                                {% for doc in documents %}
+                                <tr onclick="showDocDetail('{{ doc.doc_id }}')">
+                                    <td><code class="text-primary">{{ doc.doc_id }}</code></td>
+                                    <td><strong>{{ doc.employee }}</strong></td>
+                                    <td class="text-muted">{{ doc.department }}</td>
+                                    <td>{{ doc.type }}</td>
+                                    <td class="text-end amount">¥{{ "%.2f"|format(doc.amount) }}</td>
+                                    <td>
+                                        {% if doc.status == '待审核' %}
+                                            <span class="badge badge-status status-pending"><i class="bi bi-hourglass me-1"></i>待审核</span>
+                                        {% elif doc.status == '财务核对中' %}
+                                            <span class="badge badge-status status-checking"><i class="bi bi-search me-1"></i>财务核对</span>
+                                        {% elif doc.status == '总经理审批中' %}
+                                            <span class="badge badge-status status-approving"><i class="bi bi-person-check me-1"></i>总经理审批</span>
+                                        {% elif doc.status == '已付款' %}
+                                            <span class="badge badge-status status-paid"><i class="bi bi-check-circle me-1"></i>已付款</span>
+                                        {% elif doc.status == '已驳回' %}
+                                            <span class="badge badge-status status-rejected"><i class="bi bi-x-circle me-1"></i>已驳回</span>
+                                        {% else %}
+                                            <span class="badge badge-status">{{ doc.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-muted">{{ doc.submit_date }}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); verifyDoc('{{ doc.doc_id }}')">
+                                            <i class="bi bi-check2-circle"></i> 核对
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快速操作按钮 -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title"><i class="bi bi-lightning me-2 text-warning"></i>快速查询</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="quick-btn" onclick="sendQuick('差旅费住宿标准是多少？')">📋 住宿标准</button>
+                        <button class="quick-btn" onclick="sendQuick('招待费标准是多少？')">🍽 招待费标准</button>
+                        <button class="quick-btn" onclick="sendQuick('报销流程是怎样的？')">📝 报销流程</button>
+                        <button class="quick-btn" onclick="sendQuick('查一下 BX202609005 的状态')">🔍 查BX202609005</button>
+                        <button class="quick-btn" onclick="sendQuick('查询张军的报销单')">👤 查张军单据</button>
+                        <button class="quick-btn" onclick="sendQuick('帮我核对一下 BX202609005')">✅ 核对BX202609005</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：智能体 + 财务核对 -->
+        <div class="col-lg-4">
+
+            <!-- 智能体对话 -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title"><i class="bi bi-robot me-2 text-primary"></i>lyf智能体助手</h5>
+                    <span class="badge bg-primary">在线</span>
+                </div>
+                <div class="chat-container" id="chatContainer">
+                    <div class="chat-msg assistant">
+                        <div class="chat-avatar"><i class="bi bi-cpu"></i></div>
+                        <div class="chat-bubble">您好！我是青禾报销助手-lyf智能体 🤖
+
+我可以帮您：
+  📖 查询报销制度
+  📋 查询单据状态
+  ✅ 财务合规核对
+
+请问有什么可以帮您？</div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <div class="d-flex gap-2">
+                        <input type="text" class="form-control" id="chatInput" placeholder="问我报销相关问题..." onkeypress="if(event.key==='Enter')sendChat()">
+                        <button class="btn btn-primary" onclick="sendChat()">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 财务核对结果 -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title"><i class="bi bi-shield-check me-2 text-success"></i>财务核对结果</h5>
+                </div>
+                <div class="card-body" id="verifyPanel">
+                    <div class="text-center text-muted py-4">
+                        <i class="bi bi-file-earmark-check display-4 d-block mb-2 opacity-50"></i>
+                        <p class="mb-0">点击单据行或"核对"按钮进行财务核对</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 单据详情弹窗 -->
+<div class="modal fade" id="docDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-file-text me-2"></i>单据详情</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="docDetailContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="verifyFromModal()">
+                    <i class="bi bi-check2-circle me-1"></i>进行财务核对
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let currentVerifyDocId = '';
+
+function addChatMsg(role, text) {
+    const container = document.getElementById('chatContainer');
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + role;
+    const icon = role === 'user' ? 'bi-person' : 'bi-cpu';
+    div.innerHTML = `<div class="chat-avatar"><i class="bi ${icon}"></i></div><div class="chat-bubble"></div>`;
+    div.querySelector('.chat-bubble').textContent = text;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+async function sendChat() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    addChatMsg('user', msg);
+    try {
+        const resp = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: msg})
+        });
+        const data = await resp.json();
+        addChatMsg('assistant', data.response);
+    } catch(e) {
+        addChatMsg('assistant', '抱歉，服务暂时不可用');
+    }
+}
+
+function sendQuick(msg) {
+    document.getElementById('chatInput').value = msg;
+    sendChat();
+}
+
+async function loadDocuments() {
+    try {
+        const resp = await fetch('/api/documents');
+        const data = await resp.json();
+        const tbody = document.getElementById('docTableBody');
+        tbody.innerHTML = data.documents.map(d => {
+            let statusBadge = '';
+            if (d.status === '待审核') statusBadge = '<span class="badge badge-status status-pending">⏳ 待审核</span>';
+            else if (d.status === '财务核对中') statusBadge = '<span class="badge badge-status status-checking">🔍 财务核对</span>';
+            else if (d.status === '总经理审批中') statusBadge = '<span class="badge badge-status status-approving">👤 总经理审批</span>';
+            else if (d.status === '已付款') statusBadge = '<span class="badge badge-status status-paid">✅ 已付款</span>';
+            else if (d.status === '已驳回') statusBadge = '<span class="badge badge-status status-rejected">❌ 已驳回</span>';
+            return `<tr onclick="showDocDetail('${d.doc_id}')">
+                <td><code class="text-primary">${d.doc_id}</code></td>
+                <td><strong>${d.employee}</strong></td>
+                <td class="text-muted">${d.department || ''}</td>
+                <td>${d.type}</td>
+                <td class="text-end amount">¥${Number(d.amount).toFixed(2)}</td>
+                <td>${statusBadge}</td>
+                <td class="text-muted">${d.submit_date}</td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-primary" onclick="event.stopPropagation();verifyDoc('${d.doc_id}')"><i class="bi bi-check2-circle"></i> 核对</button>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch(e) {}
+}
+
+async function showDocDetail(docId) {
+    currentVerifyDocId = docId;
+    try {
+        const resp = await fetch('/api/documents/' + docId);
+        const data = await resp.json();
+        let itemsHtml = '';
+        data.items.forEach(i => {
+            itemsHtml += `<div class="item-row">
+                <span>${i.category} <span class="text-muted">${i.desc}</span></span>
+                <span class="amount">¥${Number(i.amount).toFixed(2)}</span>
+            </div>`;
+        });
+        document.getElementById('docDetailContent').innerHTML = `
+            <div class="row mb-3">
+                <div class="col-6"><strong>单据号:</strong> ${data.doc_id}</div>
+                <div class="col-6"><strong>提交日期:</strong> ${data.submit_date}</div>
+                <div class="col-6"><strong>申请人:</strong> ${data.employee}</div>
+                <div class="col-6"><strong>部门:</strong> ${data.department}</div>
+                <div class="col-6"><strong>类型:</strong> ${data.type}</div>
+                <div class="col-6"><strong>总金额:</strong> <span class="amount text-primary">¥${Number(data.amount).toFixed(2)}</span></div>
+                <div class="col-12"><strong>状态:</strong> ${data.status}</div>
+                ${data.reject_reason ? `<div class="col-12 text-danger"><strong>驳回原因:</strong> ${data.reject_reason}</div>` : ''}
+            </div>
+            <h6 class="mt-3 mb-2">费用明细</h6>
+            <div class="bg-light p-3 rounded">${itemsHtml}</div>
+        `;
+        new bootstrap.Modal(document.getElementById('docDetailModal')).show();
+    } catch(e) {}
+}
+
+function verifyFromModal() {
+    if (currentVerifyDocId) verifyDoc(currentVerifyDocId);
+    bootstrap.Modal.getInstance(document.getElementById('docDetailModal')).hide();
+}
+
+async function verifyDoc(docId) {
+    try {
+        const resp = await fetch('/api/verify', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({doc_id: docId})
+        });
+        const data = await resp.json();
+        let cls = 'verify-pass', icon = '✅';
+        if (data.check_status === '需关注') { cls = 'verify-warn'; icon = '⚠️'; }
+        else if (data.check_status === '信息不全') { cls = 'verify-fail'; icon = '❌'; }
+
+        let issuesHtml = '';
+        if (data.issues && data.issues.length) {
+            issuesHtml = '<div class="mt-2"><strong>发现问题:</strong><ul class="mb-0">' +
+                data.issues.map(i => '<li>' + i + '</li>').join('') + '</ul></div>';
+        }
+        let sugHtml = '';
+        if (data.suggestions && data.suggestions.length) {
+            sugHtml = '<div class="mt-2"><strong>整改建议:</strong><ul class="mb-0">' +
+                data.suggestions.map(s => '<li>' + s + '</li>').join('') + '</ul></div>';
+        }
+
+        document.getElementById('verifyPanel').innerHTML = `
+            <div class="verify-result ${cls}">
+                <h6 class="mb-2">${icon} ${data.doc_id} · ${data.employee}</h6>
+                <div><strong>核对状态:</strong> ${data.check_status}</div>
+                ${issuesHtml}
+                ${sugHtml}
+                ${data.summary ? '<div class="mt-2">' + data.summary + '</div>' : ''}
+            </div>
+        `;
+
+        addChatMsg('assistant', data.formatted);
+    } catch(e) {
+        document.getElementById('verifyPanel').innerHTML = '<div class="alert alert-danger">核对失败</div>';
+    }
+}
+</script>
+
+</body>
+</html>
