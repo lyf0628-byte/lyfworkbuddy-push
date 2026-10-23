@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>现状流程图 · 旅行行程与异常协作</title>
+<style>
+  :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#f6f8fb; color:var(--ink);
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Segoe UI",sans-serif; }
+  .bar { display:flex; align-items:center; gap:12px; padding:12px 20px; background:#fff;
+    border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+  .bar h1 { font-size:15px; margin:0; font-weight:700; }
+  .bar .sp { flex:1; }
+  button { font:600 12px/1 inherit; padding:7px 12px; border:1px solid var(--line);
+    border-radius:6px; background:#fff; color:#334155; cursor:pointer; }
+  button:hover { background:#f1f5f9; }
+  .wrap { padding:16px 20px 40px; overflow-x:auto; }
+  .paper { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px;
+    box-shadow:0 1px 3px rgba(15,23,42,.06); width:max-content; }
+  .note { max-width:1180px; margin:14px 20px 0; background:#fff; border:1px solid var(--line);
+    border-left:3px solid #f97316; border-radius:8px; padding:12px 14px; font-size:12.5px;
+    line-height:1.75; color:#334155; }
+  .note b { color:#0f172a; }
+  @media print { .bar{display:none} body{background:#fff} .wrap{overflow:visible;padding:0} .paper{border:0;box-shadow:none} }
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>现状流程图 · 旅行行程与异常协作（人工主导 · 多版本并存）</h1>
+  <span class="sp"></span>
+  <a href="to-be-flow.html"><button type="button">查看转型后流程 →</button></a>
+  <button type="button" onclick="window.print()">打印 / 导出 PDF</button>
+</div>
+
+<div class="wrap"><div class="paper"><svg id="flow"></svg></div></div>
+
+<div class="note">
+  <b>瓶颈说明。</b>全链路共 13 个步骤，其中 <b>判断点 1 个（S4 影响面判断）</b>、<b>等待点 2 个（S7 等待回执、S10 升级协调）</b>，
+  其余为人工执行。存在两处返工回路（<b>S9 → S2 退回重来</b>、<b>S8 → S5 重新核对</b>），这是异常确认耗时停留在 80 分钟、
+  通知遗漏率 14% 的直接结构原因：完成口径不统一（服务商按“发出/收到”计，导游按“对方确认资源可用”计），
+  且回执与依据散落在群消息和个人便签中，无法重建“谁触发、谁接手、何时确认”的责任链。
+</div>
+
+<script src="flow-render.js"></script>
+<script src="as-is-flow.data.js"></script>
+<script>
+const D = window.AS_IS;
+FlowRender.render(document.getElementById('flow'), Object.assign({}, D.config, {
+  lanes: D.lanes, steps: D.steps, loops: D.loops
+}));
+</script>
+</body>
+</html>
