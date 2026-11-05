@@ -1,7 +1,7 @@
 from pathlib import Path
 from agent.state import AgentState
 
-POLICY_DIR = Path(__file__).parent.parent.parent / "data" / "policies"
+POLICY_DIR = Path(__file__).parent.parent.parent / "data"
 
 
 POLICY_SECTIONS = {
