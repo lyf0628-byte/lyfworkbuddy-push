@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>行知旅行 · 业务挖掘实验室</title>
+<style>
+  :root{
+    --ink:#0f172a; --body:#334155; --muted:#64748b; --line:#e2e8f0; --bg:#f6f8fb;
+    --accent:#1d4ed8; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--body);
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Segoe UI",sans-serif;
+    font-size:14px;line-height:1.7}
+  header{background:#0f172a;color:#fff;padding:16px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  header .title{font-size:17px;font-weight:700;color:#fff}
+  header .sub{font-size:12.5px;color:#94a3b8;margin-top:2px}
+  header .sp{flex:1}
+  #q{width:240px;padding:8px 12px;border:1px solid #334155;border-radius:8px;background:#1e293b;color:#e2e8f0;font:inherit;font-size:13px}
+  #q::placeholder{color:#64748b}
+  .layout{display:flex;align-items:flex-start;gap:0}
+  nav{width:160px;flex:0 0 160px;position:sticky;top:0;padding:14px 10px}
+  .nav-item{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--body);
+    font:inherit;font-size:13.5px;padding:9px 12px;border-radius:8px;cursor:pointer;margin-bottom:2px}
+  .nav-item:hover{background:#e8edf5}
+  .nav-item.on{background:#1d4ed8;color:#fff;font-weight:600}
+  main{flex:1;padding:16px 24px 60px;min-width:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:14px;
+    box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .card h3{margin:0 0 10px;font-size:14.5px;color:var(--ink);font-weight:700}
+  .card-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+  .card-head h3{flex:1;margin:0}
+  .banner{background:#fffbeb;border:1px solid #fde68a;border-left:3px solid #f59e0b;border-radius:8px;
+    padding:11px 14px;margin-bottom:14px;font-size:12.5px;color:#78350f}
+  .banner b{color:#92400e;margin-right:8px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .kpi .k{font-size:12px;color:var(--muted)}
+  .kpi .vrow{display:flex;align-items:baseline;gap:8px;margin:4px 0 2px}
+  .kpi .now{font-size:19px;font-weight:700;color:#b91c1c}
+  .kpi .arw{color:var(--muted)}
+  .kpi .tgt{font-size:15px;font-weight:700;color:#15803d}
+  .kpi .hint{font-size:11.5px;color:var(--muted)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid2>.card{margin-bottom:0}
+  .p{margin:6px 0}
+  .small{font-size:12.5px}
+  .muted{color:var(--muted)}
+  .ul,.ol{margin:6px 0;padding-left:20px}
+  .ul li,.ol li{margin:3px 0}
+  .src{font-size:11.5px;color:var(--muted)}
+  .fail{color:#b91c1c}
+  table.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.tbl th,table.tbl td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  table.tbl th{background:#f1f5f9;color:var(--ink);font-weight:700}
+  table.kv td,table.kv th{border-color:#eef2f6}
+  .mono{font-family:ui-monospace,Consolas,Menlo,monospace}
+  .tag{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+  .tag.bad{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  .tag.warn{background:#ffedd5;color:#c2410c;border-color:#fed7aa}
+  .tag.grey{background:#f1f5f9;color:#475569;border-color:#e2e8f0}
+  .tag.go{background:#dcfce7;color:#15803d;border-color:#bbf7d0}
+  .tag.hold{background:#fef9c3;color:#a16207;border-color:#fef08a}
+  .tag.no{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  .tag.t-exec{background:#f1f5f9;color:#475569;border-color:#e2e8f0}
+  .tag.t-decision{background:#ffedd5;color:#c2410c;border-color:#fed7aa}
+  .tag.t-wait{background:#e0f2fe;color:#0369a1;border-color:#bae6fd}
+  .tag.t-manual{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+  .tag.t-engine{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}
+  .tag.t-intake{background:#ede9fe;color:#6d28d9;border-color:#ddd6fe}
+  .tagline{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+  .chip{display:inline-block;font:inherit;font-size:11.5px;padding:2px 9px;border-radius:999px;
+    border:1px solid var(--line);background:#fff;color:var(--body);cursor:pointer;margin:2px 4px 2px 0}
+  .chip:hover{background:#f1f5f9}
+  .chip.on{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+  .chip.ref{font-family:ui-monospace,Consolas,monospace;border-color:#bfdbfe;color:#1d4ed8;background:#eff6ff}
+  .btn{display:inline-block;font:inherit;font-size:12.5px;padding:6px 12px;border:1px solid var(--line);
+    border-radius:8px;background:#fff;color:var(--body);cursor:pointer;text-decoration:none}
+  .btn:hover{background:#f1f5f9}
+  .bars{margin-top:6px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin:6px 0}
+  .bar-name{width:210px;font-size:12.5px;color:var(--body)}
+  .bar-track{flex:1;height:8px;background:#eef2f6;border-radius:999px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:999px}
+  .bar-val{width:52px;text-align:right;font-size:12px;color:var(--muted)}
+  .meta-row{display:flex;gap:10px;font-size:12.5px;margin:5px 0}
+  .meta-row>span:first-child{width:88px;flex:0 0 88px;color:var(--muted)}
+  .gaps{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);font-size:12.5px}
+  .ev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .ev{background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+  .ev.hl{border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.12)}
+  .ev-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .ev-text{font-size:12.5px;color:var(--body)}
+  .ev-role{font-size:11.5px;color:var(--muted);margin-top:6px}
+  .group{font-size:13.5px;color:var(--ink);margin:16px 0 8px;font-weight:700}
+  table.matrix label{display:flex;align-items:center;gap:6px;font-size:11.5px;margin:2px 0}
+  table.matrix input[type=range]{width:78px}
+  table.matrix output{width:10px;color:var(--muted)}
+  .score-wrap{display:flex;align-items:center;gap:6px}
+  .score-bar{flex:1;height:8px;background:#eef2f6;border-radius:999px;overflow:hidden}
+  .score-fill{height:100%}
+  .score-fill.go{background:#22c55e}.score-fill.hold{background:#eab308}.score-fill.no{background:#ef4444}
+  iframe{width:100%;height:640px;border:1px solid var(--line);border-radius:8px;background:#fff}
+  @media (max-width:1180px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.ev-grid{grid-template-columns:repeat(2,1fr)}}
+  @media print{nav{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="title">行知旅行 · 业务挖掘实验室</div>
+    <div class="sub">旅行行程与异常协作（变更影响与通知闭环 · 首期试点）｜依据《业务需求发现报告》V1.0 · 36 条访谈事实 f00–f55</div>
+  </div>
+  <span class="sp"></span>
+  <input id="q" type="search" placeholder="搜索需求 / 证据 / 关键词…" />
+</header>
+
+<div class="layout">
+  <nav id="nav"></nav>
+  <main id="app"></main>
+</div>
+
+<script src="lab-data.js"></script>
+<script src="../flowcharts/as-is-flow.data.js"></script>
+<script src="../flowcharts/to-be-flow.data.js"></script>
+<script src="lab-app.js"></script>
+</body>
+</html>
