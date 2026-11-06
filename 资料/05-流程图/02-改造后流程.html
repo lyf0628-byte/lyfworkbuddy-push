@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>数智化转型后流程图 · 旅行行程与异常协作</title>
+<style>
+  :root { --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#f6f8fb; color:var(--ink);
+    font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Segoe UI",sans-serif; }
+  .bar { display:flex; align-items:center; gap:12px; padding:12px 20px; background:#fff;
+    border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+  .bar h1 { font-size:15px; margin:0; font-weight:700; }
+  .bar .sp { flex:1; }
+  button { font:600 12px/1 inherit; padding:7px 12px; border:1px solid var(--line);
+    border-radius:6px; background:#fff; color:#334155; cursor:pointer; }
+  button:hover { background:#f1f5f9; }
+  .wrap { padding:16px 20px 40px; overflow-x:auto; }
+  .paper { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px;
+    box-shadow:0 1px 3px rgba(15,23,42,.06); width:max-content; }
+  .note { max-width:1180px; margin:14px 20px 0; background:#fff; border:1px solid var(--line);
+    border-left:3px solid #2563eb; border-radius:8px; padding:12px 14px; font-size:12.5px;
+    line-height:1.75; color:#334155; }
+  .note b { color:#0f172a; }
+  table.gate { border-collapse:collapse; margin:14px 20px 30px; font-size:12.5px; background:#fff; }
+  table.gate th, table.gate td { border:1px solid var(--line); padding:7px 10px; text-align:left; }
+  table.gate th { background:#f1f5f9; font-weight:700; }
+  h2.sec { margin:22px 20px 8px; font-size:14px; }
+  @media print { .bar{display:none} body{background:#fff} .wrap{overflow:visible;padding:0} .paper{border:0;box-shadow:none} }
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>数智化转型后流程图 · 变更影响与通知闭环</h1>
+  <span class="sp"></span>
+  <a href="as-is-flow.html"><button type="button">← 返回现状流程</button></a>
+  <button type="button" onclick="window.print()">打印 / 导出 PDF</button>
+</div>
+
+<div class="wrap"><div class="paper"><svg id="flow"></svg></div></div>
+
+<div class="note">
+  <b>变化要点。</b>新增“变更影响与通知闭环引擎”泳道，承担<b>主键关联与版本校验、影响面计算、建议生成、回执闭环、超时升级、留痕</b>六项系统能力。
+  所有低于置信阈值、缺少依据、版本冲突或命中不可逆清单的情形<b>不自动执行</b>，而是通过 <b>T05 → T08 低置信转人工</b> 回路交回具名人工接收人。
+  同时保留 <b>T11 → T09 超时重发</b> 与 <b>T15 → T02 规则版本回流</b> 两条回路，使闭环可被纠偏而非一次成型。
+  完成口径统一为<b>“回执确认”而非“通知发出”</b>，这是 REQ-1 的核心。
+</div>
+
+<h2 class="sec">五级审核门（G1–G5）定义</h2>
+<table class="gate">
+  <tr><th style="width:70px">编号</th><th style="width:190px">审核门</th><th style="width:160px">责任岗位</th><th style="width:330px">放行条件</th><th>出口 / 停止条件</th></tr>
+  <tr><td>G1</td><td>口径与授权签发</td><td>运营经理（顾明岚）</td><td>谁能看、谁能拍板、哪些异常必须转人工三项书面化</td><td>未签发不得对外触达；安全主管可否决上线（f04）</td></tr>
+  <tr><td>G2</td><td>数据与主键校验</td><td>平台工程师（秦芮）</td><td>主编号、事件时间、版本三字段完整率达约定阈值</td><td>低于阈值则试点收缩为只读提醒，不进推荐样本（f33）</td></tr>
+  <tr><td>G3</td><td>建议发布确认</td><td>行程协调员（唐映秋）</td><td>建议附原记录与待确认字段，未覆盖原版本</td><td>暂停该建议，由协调员核对后继续（f15）</td></tr>
+  <tr><td>G4</td><td>不可逆动作审批</td><td>授权审批人 / 安全主管</td><td>退款、改签、赔偿、对外承诺一律人工确认</td><td>不得借用他人账号；无清单条目一律走人工（f41/f52）</td></tr>
+  <tr><td>G5</td><td>试点放行与复盘</td><td>运营经理 + 安全主管</td><td>覆盖率 100%、遗漏率 &lt;2% 且未触及停止条件</td><td>触及停止条件立即暂停并由负责人复盘（f42/f44）</td></tr>
+</table>
+
+<script src="flow-render.js"></script>
+<script src="to-be-flow.data.js"></script>
+<script>
+const D = window.TO_BE;
+FlowRender.render(document.getElementById('flow'), Object.assign({}, D.config, {
+  lanes: D.lanes, steps: D.steps, loops: D.loops
+}));
+</script>
+</body>
+</html>
