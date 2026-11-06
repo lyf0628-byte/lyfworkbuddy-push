@@ -14,8 +14,28 @@ templates = Jinja2Templates(directory=str(settings.base_dir / "app" / "web" / "t
 
 
 @router.get("/", response_class=HTMLResponse)
-def index():
-    return RedirectResponse(url="/chat")
+def index(request: Request):
+    """首页：直接返回 200 页面，避免重定向链在网关层丢失 sharecode 导致 403。
+
+    已登录 → 直接渲染聊天页；未登录 → 渲染登录页。
+    """
+    from ..security import verify_token
+
+    token = request.cookies.get("token")
+    if token:
+        payload = verify_token(token)
+        if payload:
+            user = query_one(get_conn(), "SELECT * FROM users WHERE id = ?", (payload.get("uid"),))
+            if user is not None:
+                conn = get_conn()
+                sessions = conn.execute(
+                    "SELECT * FROM sessions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 20",
+                    (user["id"],),
+                ).fetchall()
+                return templates.TemplateResponse(request, "chat.html", {
+                    "user": dict(user), "sessions": [dict(s) for s in sessions],
+                })
+    return templates.TemplateResponse(request, "login.html", {})
 
 
 @router.get("/login", response_class=HTMLResponse)
