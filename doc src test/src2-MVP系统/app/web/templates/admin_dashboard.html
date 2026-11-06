@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理后台 · 行知旅行行程变更协作</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">管</div>
+    <div><h1>行知旅行 · 管理后台</h1><div class="sub">变更事件 / 通知任务 / 转人工留痕 / 审核门 / 知识库</div></div>
+  </div>
+  <div class="user-box"><div class="who"><b>{{ user.display_name }}</b><span>管理员</span></div><div class="avatar">{{ user.display_name[0] }}</div><a class="logout" href="/logout">退出</a></div>
+</header>
+<nav class="admin-nav">
+  <a class="active" href="/admin">总览看板</a>
+  <a href="/admin/events">变更事件</a>
+</nav>
+<main>
+  <!-- 核心指标卡 -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">变更事件</div>
+      <div class="kpi-value">{{ stats.event_total }}</div>
+      <div class="kpi-sub">已闭环 {{ stats.event_closed }} · 已通知 {{ stats.event_notified }}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">待确认通知</div>
+      <div class="kpi-value">{{ stats.notify_pending }}</div>
+      <div class="kpi-sub">已确认回执 {{ stats.notify_confirmed }} 条</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">转人工留痕</div>
+      <div class="kpi-value">{{ stats.handoff_total }}</div>
+      <div class="kpi-sub">四要素强制留痕</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">审核门通过率</div>
+      <div class="kpi-value">{% if stats.gate_total %}{{ (stats.gate_passed * 100 // stats.gate_total) }}%{% else %}—{% endif %}</div>
+      <div class="kpi-sub">{{ stats.gate_passed }}/{{ stats.gate_total }} 通过</div>
+    </div>
+  </div>
+
+  <!-- 五道审核门总览 -->
+  <div class="panel">
+    <h2>五道审核门（G1-G5）</h2>
+    <div class="gate-grid">
+      <div class="gate-item"><span class="gate-tag g-g1">G1</span><span>口径与授权签发</span><i>运营经理</i></div>
+      <div class="gate-item"><span class="gate-tag g-g2">G2</span><span>数据与主键校验</span><i>平台工程师</i></div>
+      <div class="gate-item"><span class="gate-tag g-g3">G3</span><span>建议发布确认</span><i>行程协调员</i></div>
+      <div class="gate-item"><span class="gate-tag g-g4">G4</span><span>不可逆动作审批</span><i>授权审批人</i></div>
+      <div class="gate-item"><span class="gate-tag g-g5">G5</span><span>试点放行与复盘</span><i>运营经理+安全主管</i></div>
+    </div>
+  </div>
+
+  <!-- 业务规则速查 -->
+  <div class="rule-grid">
+    <div class="panel rule-panel">
+      <h2>超时升级规则</h2>
+      <div class="rule-line"><b>30 分钟</b>未回执 → <span class="st-sent">一级提醒</span></div>
+      <div class="rule-line"><b>60 分钟</b>未回执 → <span class="st-escalated">二级升级至接手人</span></div>
+      <div class="rule-note">完成口径以「资源可用回执」为准，非「通知发出」。</div>
+    </div>
+    <div class="panel rule-panel">
+      <h2>核心口径速查</h2>
+      <div class="rule-line">转人工四要素：<b>触发原因 / 接手人 / 确认时间 / 业务编号+版本</b></div>
+      <div class="rule-line">不可逆红线：退款、改签、赔偿、发车、入住、接待、旅客资料</div>
+      <div class="rule-note">上述动作系统不自主执行，一律强制人工审批（G4）。</div>
+    </div>
+  </div>
+
+  <div class="admin-grid">
+    <div class="panel">
+      <h2>变更事件 <span class="badge">{{ events|length }}</span></h2>
+      <table>
+        <tr><th>ID</th><th>团号</th><th>版本</th><th>类型</th><th>状态</th></tr>
+        {% for e in events %}
+        <tr><td>{{ e.id }}</td><td>{{ e.tour_no }}</td><td>{{ e.version }}</td><td>{{ e.event_type }}</td><td><span class="status-tag st-{{ e.status }}">{{ e.status }}</span></td></tr>
+        {% else %}<tr><td colspan="5" class="muted">暂无事件</td></tr>{% endfor %}
+      </table>
+    </div>
+    <div class="panel">
+      <h2>通知任务 <span class="badge">{{ notify|length }}</span></h2>
+      <table>
+        <tr><th>ID</th><th>事件</th><th>渠道</th><th>状态</th><th>回执类型</th></tr>
+        {% for n in notify %}
+        <tr><td>{{ n.id }}</td><td>{{ n.event_id }}</td><td>{{ n.channel }}</td><td><span class="status-tag st-{{ n.status }}">{{ n.status }}</span></td><td>{{ n.receipt_type or '—' }}</td></tr>
+        {% else %}<tr><td colspan="5" class="muted">暂无通知</td></tr>{% endfor %}
+      </table>
+    </div>
+    <div class="panel">
+      <h2>转人工留痕（四要素） <span class="badge">{{ handoffs|length }}</span></h2>
+      <table>
+        <tr><th>ID</th><th>触发原因</th><th>接手人</th><th>确认时间</th><th>业务编号</th></tr>
+        {% for h in handoffs %}
+        <tr><td>{{ h.id }}</td><td>{{ h.trigger_reason }}</td><td>{{ h.assignee }}</td><td>{{ h.confirm_time }}</td><td>{{ h.biz_ref }}</td></tr>
+        {% else %}<tr><td colspan="5" class="muted">暂无转人工记录</td></tr>{% endfor %}
+      </table>
+    </div>
+    <div class="panel">
+      <h2>知识库文档 <span class="badge">{{ docs|length }}</span></h2>
+      <table>
+        <tr><th>ID</th><th>标题</th><th>版本</th><th>状态</th></tr>
+        {% for d in docs %}
+        <tr><td>{{ d.id }}</td><td>{{ d.title }}</td><td>{{ d.version }}</td><td><span class="status-tag st-closed">{{ d.status }}</span></td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</main>
+</body>
+</html>

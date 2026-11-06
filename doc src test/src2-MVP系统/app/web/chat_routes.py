@@ -41,6 +41,10 @@ def chat_page(request: Request):
     if user is None:
         from fastapi.responses import RedirectResponse
         return RedirectResponse(url="/login")
+    # 管理端角色不进入员工聊天页，统一回管理后台
+    if user["role"] in ("admin", "ops_manager", "security"):
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/admin")
     conn = get_conn()
     sessions = conn.execute(
         "SELECT * FROM sessions WHERE user_id = ? ORDER BY updated_at DESC LIMIT 20", (user["id"],)

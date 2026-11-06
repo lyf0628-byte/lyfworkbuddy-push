@@ -107,6 +107,33 @@ main{padding:28px 32px;max-width:1000px;margin:0 auto;display:flex;flex-directio
 .chat-input button:hover{background:var(--primary-dark);box-shadow:0 4px 12px rgba(26,107,82,.3)}
 
 /* ============ 管理后台 ============ */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:22px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 20px;box-shadow:var(--shadow);border-left:4px solid var(--primary)}
+.kpi-card .kpi-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.kpi-card .kpi-value{font-size:28px;font-weight:800;color:var(--primary-dark);line-height:1.1}
+.kpi-card .kpi-sub{font-size:12px;color:var(--muted);margin-top:6px}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.gate-item{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--primary-light);
+  border:1px solid #d3e5db;border-radius:12px;font-size:13px}
+.gate-item span{font-weight:600;color:var(--primary-dark)}
+.gate-item i{font-style:normal;font-size:11px;color:var(--muted);margin-left:auto}
+.gate-tag{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+  border-radius:8px;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
+.g-g1{background:#3b5bdb}.g-g2{background:#1098ad}.g-g3{background:#e8590c}
+.g-g4{background:#c0392b}.g-g5{background:#5f3dc4}
+.rule-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:22px;margin-bottom:22px}
+.rule-panel{margin-bottom:0}
+.rule-line{font-size:13px;color:var(--text);line-height:1.9;padding:4px 0;border-bottom:1px dashed var(--border)}
+.rule-line:last-of-type{border-bottom:none}
+.rule-line b{color:var(--primary-dark)}
+.rule-note{font-size:12px;color:var(--muted);margin-top:10px;padding:8px 12px;background:var(--bg);border-radius:8px}
+.admin-nav{background:var(--primary-light);border-bottom:1px solid var(--border);
+  padding:0 32px;display:flex;gap:4px}
+.admin-nav a{display:inline-block;padding:12px 20px;color:var(--primary-dark);
+  text-decoration:none;font-size:14px;border-bottom:2px solid transparent;transition:.18s}
+.admin-nav a:hover{background:rgba(26,107,82,.06)}
+.admin-nav a.active{color:var(--primary);border-bottom:2px solid var(--primary);font-weight:700}
 .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
   padding:22px;margin-bottom:22px;box-shadow:var(--shadow)}
 .panel h2{font-size:16px;color:var(--primary-dark);margin-bottom:16px;padding-bottom:10px;

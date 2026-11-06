@@ -9,11 +9,15 @@
 <body>
 <header>
   <div class="brand">
-    <div class="logo">行</div>
+    <div class="logo">管</div>
     <div><h1>变更事件列表</h1><div class="sub">全部变更事件（含转人工与已关闭）</div></div>
   </div>
-  <div class="user-box"><div class="who"><b>{{ user.display_name }}</b></div><div class="avatar">{{ user.display_name[0] }}</div><a class="logout" href="/logout">退出</a></div>
+  <div class="user-box"><div class="who"><b>{{ user.display_name }}</b><span>管理员</span></div><div class="avatar">{{ user.display_name[0] }}</div><a class="logout" href="/logout">退出</a></div>
 </header>
+<nav class="admin-nav">
+  <a href="/admin">总览看板</a>
+  <a class="active" href="/admin/events">变更事件</a>
+</nav>
 <main>
   <div class="panel">
     <table>

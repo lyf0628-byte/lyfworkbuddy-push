@@ -39,6 +39,25 @@ def admin_dashboard(request: Request):
     handoffs = conn.execute("SELECT * FROM manual_handoffs ORDER BY id DESC LIMIT 50").fetchall()
     gates = conn.execute("SELECT * FROM gate_logs ORDER BY id DESC LIMIT 50").fetchall()
     docs = conn.execute("SELECT id, title, version, status, updated_at FROM policy_docs ORDER BY id").fetchall()
+
+    # ---- 看板统计指标（口径与 rules.key_metrics 一致）----
+    stats = {
+        "event_total": conn.execute("SELECT COUNT(*) c FROM change_events").fetchone()["c"],
+        "event_closed": conn.execute(
+            "SELECT COUNT(*) c FROM change_events WHERE status = 'closed'").fetchone()["c"],
+        "event_notified": conn.execute(
+            "SELECT COUNT(*) c FROM change_events WHERE status = 'notified'").fetchone()["c"],
+        "notify_pending": conn.execute(
+            "SELECT COUNT(*) c FROM notify_tasks WHERE status IN ('pending','sent')").fetchone()["c"],
+        "notify_confirmed": conn.execute(
+            "SELECT COUNT(*) c FROM notify_tasks WHERE status = 'confirmed'").fetchone()["c"],
+        "handoff_total": conn.execute("SELECT COUNT(*) c FROM manual_handoffs").fetchone()["c"],
+        "gate_total": conn.execute("SELECT COUNT(*) c FROM gate_logs").fetchone()["c"],
+        "gate_passed": conn.execute(
+            "SELECT COUNT(*) c FROM gate_logs WHERE result = 'passed'").fetchone()["c"],
+        "user_total": conn.execute("SELECT COUNT(*) c FROM users").fetchone()["c"],
+    }
+
     return templates.TemplateResponse(request, "admin_dashboard.html", {
         "user": dict(user),
         "events": [dict(e) for e in events],
@@ -46,6 +65,7 @@ def admin_dashboard(request: Request):
         "handoffs": [dict(h) for h in handoffs],
         "gates": [dict(g) for g in gates],
         "docs": [dict(d) for d in docs],
+        "stats": stats,
     })
 
 
