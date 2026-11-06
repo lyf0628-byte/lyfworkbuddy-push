@@ -23,8 +23,8 @@
 
 | 序号 | 任务要求 | 存放目录 | 文件 |
 |---|---|---|---|
-| src 1 | 问答助手归档 | `src1-问答助手/` | 问答助手与MVP系统说明.md |
-| src 2 | MVP 项目（工程架构/Agent框架/知识库/3处审核点） | `src2-MVP系统/` | index.html / app.js / kb.js |
+| src 1 | 问答助手归档 | `src1-问答助手/` | 问答助手与MVP系统说明.md + 阶段1-前端演示/（index.html/app.js/kb.js 归档） |
+| src 2 | MVP 项目（工程架构/Agent框架/知识库/3处审核点） | `src2-MVP系统/` | 可运行后端系统：FastAPI + Agent 引擎 + 混合检索 + SQLite，30 条评测 30/30 |
 
 ### Test（3 项）
 

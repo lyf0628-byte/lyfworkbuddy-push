@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>变更事件 · 管理后台</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div><h1>变更事件列表</h1><div class="sub">全部变更事件（含转人工与已关闭）</div></div>
+  <div class="user-box"><span>{{ user.display_name }}</span><a class="logout" href="/logout">退出</a></div>
+</header>
+<main>
+  <div class="panel">
+    <table>
+      <tr><th>ID</th><th>团号</th><th>订单号</th><th>版本</th><th>类型</th><th>描述</th><th>状态</th><th>时间</th></tr>
+      {% for e in events %}
+      <tr><td>{{ e.id }}</td><td>{{ e.tour_no }}</td><td>{{ e.order_no or '—' }}</td><td>{{ e.version }}</td><td>{{ e.event_type }}</td><td>{{ e.description }}</td><td>{{ e.status }}</td><td>{{ e.created_at }}</td></tr>
+      {% else %}<tr><td colspan="8" class="muted">暂无事件</td></tr>{% endfor %}
+    </table>
+  </div>
+</main>
+</body>
+</html>

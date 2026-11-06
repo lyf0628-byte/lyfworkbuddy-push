@@ -1,0 +1,7 @@
+# 忽略数据与缓存
+data/*.db
+data/*.db-wal
+data/*.db-shm
+__pycache__/
+*.pyc
+.env

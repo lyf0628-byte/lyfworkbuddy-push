@@ -1,0 +1,6 @@
+# Web 层依赖（控制台演示 quickstart.py 不需要这些，纯标准库即可跑）
+# 安装：python -m pip install -r requirements.txt
+fastapi>=0.110,<1.0
+uvicorn>=0.27,<1.0
+jinja2>=3.1,<4.0
+python-multipart>=0.0.9
