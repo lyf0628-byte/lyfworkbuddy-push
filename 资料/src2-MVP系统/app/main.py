@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 
 from .config import settings
 from .db import init_db
@@ -14,6 +15,9 @@ app = FastAPI(title="行知旅行 · 行程变更与异常协作 MVP", version="
 
 # 启动时初始化数据库（幂等）
 _conn = init_db()
+
+# 静态资源（样式/脚本）：聊天页与管理后台依赖 style.css
+app.mount("/static", StaticFiles(directory=str(settings.base_dir / "app" / "web" / "static")), name="static")
 
 
 @app.get("/healthz")

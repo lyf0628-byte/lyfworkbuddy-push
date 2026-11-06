@@ -8,31 +8,34 @@
 </head>
 <body>
 <header>
-  <div><h1>行知旅行 · 管理后台</h1><div class="sub">变更事件 / 通知任务 / 转人工留痕 / 审核门 / 知识库</div></div>
-  <div class="user-box"><span>{{ user.display_name }}</span><a class="logout" href="/logout">退出</a></div>
+  <div class="brand">
+    <div class="logo">行</div>
+    <div><h1>行知旅行 · 管理后台</h1><div class="sub">变更事件 / 通知任务 / 转人工留痕 / 审核门 / 知识库</div></div>
+  </div>
+  <div class="user-box"><div class="who"><b>{{ user.display_name }}</b></div><div class="avatar">{{ user.display_name[0] }}</div><a class="logout" href="/logout">退出</a></div>
 </header>
 <main>
   <div class="admin-grid">
     <div class="panel">
-      <h2>变更事件（最近 50）</h2>
+      <h2>变更事件 <span class="badge">{{ events|length }}</span></h2>
       <table>
         <tr><th>ID</th><th>团号</th><th>版本</th><th>类型</th><th>状态</th></tr>
         {% for e in events %}
-        <tr><td>{{ e.id }}</td><td>{{ e.tour_no }}</td><td>{{ e.version }}</td><td>{{ e.event_type }}</td><td>{{ e.status }}</td></tr>
+        <tr><td>{{ e.id }}</td><td>{{ e.tour_no }}</td><td>{{ e.version }}</td><td>{{ e.event_type }}</td><td><span class="status-tag st-{{ e.status }}">{{ e.status }}</span></td></tr>
         {% else %}<tr><td colspan="5" class="muted">暂无事件</td></tr>{% endfor %}
       </table>
     </div>
     <div class="panel">
-      <h2>通知任务（最近 50）</h2>
+      <h2>通知任务 <span class="badge">{{ notify|length }}</span></h2>
       <table>
         <tr><th>ID</th><th>事件</th><th>渠道</th><th>状态</th><th>回执类型</th></tr>
         {% for n in notify %}
-        <tr><td>{{ n.id }}</td><td>{{ n.event_id }}</td><td>{{ n.channel }}</td><td>{{ n.status }}</td><td>{{ n.receipt_type or '—' }}</td></tr>
+        <tr><td>{{ n.id }}</td><td>{{ n.event_id }}</td><td>{{ n.channel }}</td><td><span class="status-tag st-{{ n.status }}">{{ n.status }}</span></td><td>{{ n.receipt_type or '—' }}</td></tr>
         {% else %}<tr><td colspan="5" class="muted">暂无通知</td></tr>{% endfor %}
       </table>
     </div>
     <div class="panel">
-      <h2>转人工留痕（四要素）</h2>
+      <h2>转人工留痕（四要素） <span class="badge">{{ handoffs|length }}</span></h2>
       <table>
         <tr><th>ID</th><th>触发原因</th><th>接手人</th><th>确认时间</th><th>业务编号</th></tr>
         {% for h in handoffs %}
@@ -41,11 +44,11 @@
       </table>
     </div>
     <div class="panel">
-      <h2>知识库文档</h2>
+      <h2>知识库文档 <span class="badge">{{ docs|length }}</span></h2>
       <table>
         <tr><th>ID</th><th>标题</th><th>版本</th><th>状态</th></tr>
         {% for d in docs %}
-        <tr><td>{{ d.id }}</td><td>{{ d.title }}</td><td>{{ d.version }}</td><td>{{ d.status }}</td></tr>
+        <tr><td>{{ d.id }}</td><td>{{ d.title }}</td><td>{{ d.version }}</td><td><span class="status-tag st-closed">{{ d.status }}</span></td></tr>
         {% endfor %}
       </table>
     </div>

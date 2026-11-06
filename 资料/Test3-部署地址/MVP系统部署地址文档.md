@@ -21,7 +21,10 @@
 
 **https://xingzhi-travel-mvp.app.workbuddy.host/?sharecode=4H2PVSD2ES**
 
-> 复制此链接即可在任意浏览器打开 MVP 系统。
+> 复制此链接即可在任意浏览器打开 MVP 系统（打开后直接进入登录页）。
+
+> 说明：根路径 `/` 已改为直接返回登录页（而非重定向到 `/chat`），
+> 避免重定向链在网关层丢失 sharecode 参数导致 403/Not Found。
 
 ### 演示账号
 

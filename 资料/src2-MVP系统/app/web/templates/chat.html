@@ -8,45 +8,69 @@
 </head>
 <body>
 <header>
-  <div>
-    <h1>行知旅行 · 行程变更协作助手</h1>
-    <div class="sub">变更影响与通知闭环 · 完成口径以「资源可用回执」为准 · 不可逆动作一律转人工</div>
+  <div class="brand">
+    <div class="logo">行</div>
+    <div>
+      <h1>行知旅行 · 行程变更协作助手</h1>
+      <div class="sub">变更影响与通知闭环 · 完成口径以「资源可用回执」为准 · 不可逆动作一律转人工</div>
+    </div>
   </div>
   <div class="user-box">
-    <span>{{ user.display_name }}（{{ user.role }}）</span>
+    <div class="who">
+      <b>{{ user.display_name }}</b>
+      <span>{{ user.role }}</span>
+    </div>
+    <div class="avatar">{{ user.display_name[0] }}</div>
     <a class="logout" href="/logout">退出</a>
   </div>
 </header>
+
 <main>
   <div class="chat-container">
+    <div class="chat-head">
+      <span class="dot"></span>
+      <span class="t">行程变更协作助手</span>
+      <span class="s">在线 · 已接入规程知识库</span>
+    </div>
     <div class="chat-box" id="chatBox">
-      <div class="msg ai"><div class="bubble">你好，我是行知旅行的行程变更协作助手。<br>你可以问我：通知遗漏率的目标是多少？转人工需要哪些要素？<br>或者登记变更事件：如「航班延误，团号 T2026-001，帮我登记」。</div></div>
+      <div class="msg ai">
+        <div class="avatar-mini">行</div>
+        <div class="wrap">
+          <div class="bubble">你好，我是行知旅行的行程变更协作助手。<br><br>你可以问我：<br>· 通知遗漏率的目标是多少？<br>· 转人工需要填写哪些要素？<br><br>也可以登记变更事件，例如：<br>「航班延误，团号 T2026-001，帮我登记」</div>
+        </div>
+      </div>
     </div>
-    <div class="chat-input">
-      <input id="msgInput" placeholder="输入你的问题或变更事件…" onkeydown="if(event.key==='Enter')send()">
-      <button onclick="send()">发送</button>
-    </div>
-    <div class="quick">
-      <button onclick="quick('通知遗漏率的目标是多少')">遗漏率目标</button>
-      <button onclick="quick('异常确认耗时的目标是多少')">耗时目标</button>
-      <button onclick="quick('转人工需要填写哪些要素')">转人工四要素</button>
-      <button onclick="quick('系统能不能自动退款')">能否自动退款</button>
-      <button onclick="quick('有哪五道审核门')">五道审核门</button>
+    <div class="chat-foot">
+      <div class="quick">
+        <button onclick="quick('通知遗漏率的目标是多少')">遗漏率目标</button>
+        <button onclick="quick('异常确认耗时的目标是多少')">耗时目标</button>
+        <button onclick="quick('转人工需要填写哪些要素')">转人工四要素</button>
+        <button onclick="quick('系统能不能自动退款')">能否自动退款</button>
+        <button onclick="quick('有哪五道审核门')">五道审核门</button>
+      </div>
+      <div class="chat-input">
+        <input id="msgInput" placeholder="输入你的问题或变更事件…" onkeydown="if(event.key==='Enter')send()">
+        <button onclick="send()">发送</button>
+      </div>
     </div>
   </div>
 </main>
+
 <script>
 let sessionId = 0;
 const box = document.getElementById('chatBox');
 
-function addMsg(role, text, src) {
+function scrollBottom() { box.scrollTop = box.scrollHeight; }
+
+function addMsg(role, text) {
   const d = document.createElement('div');
   d.className = 'msg ' + (role === 'user' ? 'user' : 'ai');
-  d.innerHTML = '<div class="bubble"></div>' + (src ? '<div class="src">' + src + '</div>' : '');
+  const avatar = role === 'user' ? '我' : '行';
+  d.innerHTML = '<div class="avatar-mini">' + avatar + '</div><div class="wrap"><div class="bubble"></div></div>';
   d.querySelector('.bubble').textContent = text;
   box.appendChild(d);
-  box.scrollTop = box.scrollHeight;
-  return d.querySelector('.bubble');
+  scrollBottom();
+  return d;
 }
 
 async function send() {
@@ -55,7 +79,9 @@ async function send() {
   if (!q) return;
   inp.value = '';
   addMsg('user', q);
-  const bubble = addMsg('ai', '…');
+  const aiMsg = addMsg('ai', '正在思考…');
+  const bubble = aiMsg.querySelector('.bubble');
+  const wrap = aiMsg.querySelector('.wrap');
 
   try {
     const resp = await fetch('/api/chat', {
@@ -65,7 +91,7 @@ async function send() {
     });
     const reader = resp.body.getReader();
     const dec = new TextDecoder();
-    let buf = '', answer = '', pendingConfirm = false;
+    let buf = '', answer = '', hasContent = false;
 
     while (true) {
       const {done, value} = await reader.read();
@@ -76,25 +102,35 @@ async function send() {
         const line = buf.slice(0, idx).trim();
         buf = buf.slice(idx + 2);
         if (!line.startsWith('data:')) continue;
-        const ev = JSON.parse(line.slice(5));
-        if (ev.type === 'token') { answer += ev.text; bubble.textContent = answer; }
-        else if (ev.type === 'confirm_required') {
-          pendingConfirm = true;
+        let ev;
+        try { ev = JSON.parse(line.slice(5)); } catch(e) { continue; }
+        if (ev.type === 'token') {
+          if (!hasContent) { hasContent = true; bubble.textContent = ''; }
+          answer += ev.text; bubble.textContent = answer; scrollBottom();
+        } else if (ev.type === 'confirm_required') {
+          hasContent = true;
           bubble.textContent = ev.message || '影响面建议需 G3 人工确认后方可下发通知。';
-          bubble.insertAdjacentHTML('afterend', '<div class="confirm-bar">' +
-            '<button onclick="confirmNotify(true)">确认下发</button>' +
-            '<button onclick="confirmNotify(false)">取消</button></div>');
-        }
-        else if (ev.type === 'citations' && ev.items && ev.items.length) {
-          const src = ev.items.map((c,i)=>(i+1)+'. 《'+(c.doc_title||c.doc)+'》'+c.heading).join('  ');
-          bubble.insertAdjacentHTML('afterend', '<div class="src">依据：'+src+'</div>');
-        }
-        else if (ev.type === 'error') { bubble.textContent = '错误：' + ev.message; }
-        else if (ev.type === 'done' && ev.meta) {
-          if (ev.meta.pending) { /* 已显示确认条 */ }
+          const bar = document.createElement('div');
+          bar.className = 'confirm-bar';
+          bar.innerHTML = '<span class="tip">⚠️ 通知下发前需人工确认（G3 审核门）</span>' +
+            '<button class="ok" onclick="confirmNotify(true)">确认下发</button>' +
+            '<button class="no" onclick="confirmNotify(false)">取消</button>';
+          wrap.appendChild(bar);
+          scrollBottom();
+        } else if (ev.type === 'citations' && ev.items && ev.items.length) {
+          const src = ev.items.map((c,i)=>(i+1)+'.《'+(c.doc_title||c.doc)+'》'+c.heading).join('  ');
+          const srcEl = document.createElement('div');
+          srcEl.className = 'src';
+          srcEl.textContent = '依据：' + src;
+          wrap.appendChild(srcEl);
+          scrollBottom();
+        } else if (ev.type === 'error') {
+          hasContent = true;
+          bubble.textContent = '⚠️ ' + ev.message;
         }
       }
     }
+    if (!hasContent) bubble.textContent = '（未返回内容）';
   } catch (e) {
     bubble.textContent = '请求失败：' + e;
   }
@@ -106,16 +142,16 @@ function quick(q) {
 }
 
 async function confirmNotify(accepted) {
+  document.querySelectorAll('.confirm-bar').forEach(el => el.remove());
+  const m = addMsg('ai', accepted ? '正在下发通知…' : '已取消');
   try {
     const resp = await fetch('/api/confirm_notify', {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({accepted, session_id: sessionId}),
     });
     const data = await resp.json();
-    addMsg('ai', data.message || (data.ok ? '已处理' : '处理失败'));
-  } catch (e) { addMsg('ai', '确认失败：' + e); }
-  // 移除确认条
-  document.querySelectorAll('.confirm-bar').forEach(el => el.remove());
+    m.querySelector('.bubble').textContent = data.message || (data.ok ? '已处理' : '处理失败');
+  } catch (e) { m.querySelector('.bubble').textContent = '确认失败：' + e; }
 }
 </script>
 </body>
