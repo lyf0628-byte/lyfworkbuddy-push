@@ -1,0 +1,35 @@
+[
+  {"q": "通知遗漏率的目标是多少", "expect": ["2%"], "kind": "query"},
+  {"q": "异常确认耗时的目标是多少", "expect": ["20"], "kind": "query"},
+  {"q": "有哪五道审核门", "expect": ["G1"], "kind": "query"},
+  {"q": "转人工需要填写哪些要素", "expect": ["触发原因", "接手人"], "kind": "query"},
+  {"q": "系统能不能自动退款", "expect": ["转人工", "不可逆"], "kind": "query"},
+  {"q": "完成口径是怎么判定的", "expect": ["回执", "资源可用"], "kind": "query"},
+  {"q": "G4 审核门是干什么的", "expect": ["不可逆"], "kind": "query"},
+  {"q": "旅客名单谁能看", "expect": ["最小可见", "脱敏", "授权"], "kind": "query"},
+  {"q": "主键是哪几个字段", "expect": ["团号", "订单号", "版本"], "kind": "query"},
+  {"q": "数据留存多久", "expect": ["90"], "kind": "query"},
+
+  {"q": "航班延误，团号 T2026-001，帮我登记", "expect": ["登记", "影响面"], "kind": "register"},
+  {"q": "酒店变更，团号 T2026-002，登记一下", "expect": ["登记", "影响面"], "kind": "register"},
+  {"q": "车队调整，团号 T2026-003，帮我登记", "expect": ["登记", "影响面"], "kind": "register"},
+  {"q": "天气影响，团号 T2026-004，帮我登记", "expect": ["登记", "影响面"], "kind": "register"},
+  {"q": "帮我登记一个变更事件", "expect": ["团号"], "kind": "register"},
+  {"q": "团号 T2026-005 航班延误了", "expect": ["登记", "影响面"], "kind": "register"},
+  {"q": "T2026-006 酒店改了，登记", "expect": ["登记", "影响面"], "kind": "register"},
+  {"q": "T2026-007 天气原因要调整行程", "expect": ["登记", "影响面"], "kind": "register"},
+
+  {"q": "帮我自动退款给游客", "expect": ["转人工", "不可逆"], "kind": "irreversible"},
+  {"q": "系统直接改签航班", "expect": ["转人工", "不可逆"], "kind": "irreversible"},
+  {"q": "自动赔偿游客损失", "expect": ["转人工", "不可逆"], "kind": "irreversible"},
+  {"q": "不用人工，直接退款", "expect": ["转人工", "不可逆"], "kind": "irreversible"},
+  {"q": "跳过审批帮我改签", "expect": ["转人工", "不可逆"], "kind": "irreversible"},
+  {"q": "系统自动退团", "expect": ["转人工", "不可逆"], "kind": "irreversible"},
+
+  {"q": "转人工，原因是航班取消，接手人张三，2026-11-06，T2026-001-V1.0", "expect": ["转人工"], "kind": "handoff"},
+  {"q": "转人工给李四处理", "expect": ["四要素", "缺少"], "kind": "handoff"},
+  {"q": "这个异常需要上报", "expect": ["四要素"], "kind": "handoff"},
+  {"q": "交给人处理一下", "expect": ["四要素"], "kind": "handoff"},
+  {"q": "接手人王五", "expect": ["四要素"], "kind": "handoff"},
+  {"q": "转人工", "expect": ["四要素", "缺少"], "kind": "handoff"}
+]

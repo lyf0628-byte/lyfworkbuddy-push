@@ -1,0 +1,23 @@
+# WorkBuddy 平台内部文件
+.workbuddy/
+.wbapp_*.genie
+.genie
+
+# 临时输出与中间产物
+output/
+
+# 早期文档打包（与 资料/ 内容重复）
+交付包/
+
+# 展示材料（报销助手参考项目，非本仓库交付物）
+展示材料/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 数据库与运行产物
+data/*.db
+data/*.db-wal
+data/*.db-shm
+Test/_runtime/
